@@ -63,7 +63,7 @@
 
 <script>
 // ─── CONFIG ───────────────────────────────────────────────────────────────────
-const WEBHOOK_URL = "http://localhost:5678/webhook/f0db9d33-9242-4235-bf88-61f19d5e8262";
+const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwsszZieDXTydzYcOAnBlVkAYMZoFi-tBh8-NtfDwzgjFC4oTc1If2jbiYXfZidlWyy/exec";
 
 // ─── DATA ─────────────────────────────────────────────────────────────────────
 const CATEGORIES = [
@@ -136,8 +136,9 @@ function el(id){return document.getElementById(id);}
 // ─── WEBHOOK ──────────────────────────────────────────────────────────────────
 async function sendToWebhook(data){
   try{
-    const res=await fetch(WEBHOOK_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
-    return res.ok;
+    // Google Apps Script requires no-cors; response is always opaque — assume success
+    await fetch(WEBHOOK_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain"},body:JSON.stringify(data)});
+    return true;
   }catch(e){console.error("Webhook:",e);return false;}
 }
 function buildPayload(session){
@@ -353,7 +354,7 @@ function showResult(){
     <div style="font-size:13px;color:rgba(255,255,255,0.45);margin-bottom:20px;text-align:center">${s.name} เลือก B (สะอาด) ${s.bCount}/10 ครั้ง</div>
 
     <div id="wh-status" class="wh-badge" style="margin-bottom:16px;background:rgba(255,214,102,0.1);border:1px solid rgba(255,214,102,0.3);color:#ffd166">
-      <span class="wh-dot" style="background:#ffd166"></span>ส่งข้อมูลไป n8n...
+      <span class="wh-dot" style="background:#ffd166"></span>ส่งข้อมูลไป Google Sheets...
     </div>
 
     <div style="width:100%;max-width:320px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:18px;overflow:hidden;margin-bottom:16px">
@@ -381,12 +382,12 @@ function showResult(){
       badge.style.background="rgba(34,197,94,0.1)";
       badge.style.borderColor="rgba(34,197,94,0.3)";
       badge.style.color="#22c55e";
-      badge.innerHTML="✓ ส่งข้อมูลสำเร็จ → n8n webhook";
+      badge.innerHTML="✓ ส่งข้อมูลสำเร็จ → Google Sheets";
     } else {
       badge.style.background="rgba(255,107,107,0.1)";
       badge.style.borderColor="rgba(255,107,107,0.3)";
       badge.style.color="#ff6b6b";
-      badge.innerHTML="✗ ส่งไม่ได้ — ตรวจสอบ n8n / CORS";
+      badge.innerHTML="✗ ส่งไม่ได้ — ตรวจสอบ Apps Script URL";
     }
   });
 }
